@@ -2,8 +2,10 @@ import Head from "next/head";
 import PageLoading from "../components/widgets/PageLoading";
 import "../styles/globals.css";
 import Script from "next/script";
+import { useRouter } from "next/router";
 import { attributes as settings } from "../content/settings.md";
 import AuthWrapper from "../components/listings/AuthWrapper";
+import SpeedInsightsComponent from "../components/SpeedInsights";
 
 function MyApp({ Component, pageProps }) {
   return (
@@ -33,6 +35,7 @@ function MyApp({ Component, pageProps }) {
         <PageLoading />
         <Component {...pageProps} />
       </AuthWrapper>
+      <SpeedInsightsComponent />
       <Script
         strategy="afterInteractive"
         src="https://www.googletagmanager.com/gtag/js?id=AW-11512447042"
