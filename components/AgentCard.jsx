@@ -43,7 +43,7 @@ export default function AgentCard({
         </div>
         <img
           alt="Mapema properties"
-          src="/logo.jpg"
+          src="/logo.png"
           className="w-[100px] h-[100px] object-cover mx-auto rounded-full flex items-center justify-center text-white bg-slate-700"
         />
 
@@ -65,7 +65,7 @@ export default function AgentCard({
             href={`https://wa.me/${
               settings.phone
             }?text=I am interested in your property: Ref ${upperCase(
-              listingRef.split("-").pop()
+              listingRef.split("-").pop(),
             )} - ${SITE_URL}/properties/${listingRef}
             `}
             className="flex items-center justify-center rounded-sm mb-2 text-black px-6 py-3 w-full text-center bg-gold hover:bg-charcoal hover:text-white"
@@ -75,9 +75,9 @@ export default function AgentCard({
           </a>
           <a
             href={`mailto:${settings.email}?subject=${encodeURIComponent(
-              "I am interested in your property: Ref - " + listingRef
+              "I am interested in your property: Ref - " + listingRef,
             )}&body=${encodeURIComponent(
-              `Please contact me about your listing - ${SITE_URL}/properties/${listingRef}`
+              `Please contact me about your listing - ${SITE_URL}/properties/${listingRef}`,
             )}`}
             className="flex items-center justify-center rounded-sm mb-2 text-black px-6 py-3 w-full text-center bg-gold hover:bg-charcoal hover:text-white"
           >

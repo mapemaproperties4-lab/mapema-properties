@@ -39,7 +39,7 @@ const MultipleImagesUpload = ({ form, field }) => {
 
           // --- Add watermark image (top left) ---
           const watermark = new Image();
-          watermark.src = "/logo.jpg"; // path to your logo in public folder
+          watermark.src = "/logo.png"; // path to your logo in public folder
           watermark.onload = () => {
             const w = 100; // logo width
             const h = (watermark.height / watermark.width) * w;

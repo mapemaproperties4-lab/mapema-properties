@@ -142,7 +142,7 @@ const Nav = () => {
               <Link href="/" className="h-full flex items-center mr-6">
                 <img
                   className="h-[80px] w-auto"
-                  src="/logo.jpg"
+                  src="/logo.png"
                   alt={data.siteName}
                 />
               </Link>

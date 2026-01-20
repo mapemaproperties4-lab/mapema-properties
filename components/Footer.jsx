@@ -75,8 +75,8 @@ const Footer = () => {
           <div className="w-full sm:w-auto">
             <img
               className="h-[48px] md:h-[60px] w-auto"
-              src="/logo.jpg"
-              alt="Dreamfort Realtors logo"
+              src="/logo.png"
+              alt="Mapema Properties logo"
             />
           </div>
           <div>
