@@ -6,10 +6,13 @@ export async function listingsAPI(req) {
   try {
     let listings = await getListings();
 
-    console.log(listings.length);
-
     let query = req.query || {};
     let listingCount;
+
+    // filter by published
+    if (query.published) {
+      listings = listings.filter((i) => i.published);
+    }
 
     // filter by offer
     if (query.offer) {
@@ -65,7 +68,7 @@ export async function listingsAPI(req) {
 
     // filter by features
     if (query.featured) {
-      listings = listings.filter((i) => i.featured === true);
+      listings = listings.filter((i) => i.is_featured === true);
     }
 
     // filter by min price

@@ -29,7 +29,7 @@ const ListingCard = ({ data }) => {
   return (
     <section className="w-full group relative group border rounded">
       <div className="absolute top-0 right-0 w-[150px] h-[150px] overflow-hidden uppercase z-30">
-        {data.sold ? (
+        {data.status === "sold" || data.status === "rented" ? (
           <span className="-left-[25px] top-[30px] rotate-45 block w-[260px] p-[6px_0] text-white text-center bg-red-600 absolute">
             {data.offer === "rent" ? "Rented" : "Sold"}
           </span>

@@ -19,7 +19,7 @@ export default function BoostOptions({ listing }) {
     let dataToSave = {};
     switch (action) {
       case "top":
-        dataToSave = { is_featured: listing.is_featured ? false : true };
+        dataToSave = { is_featured: listing.is_featured ? false : true, created_at: new Date().toISOString() };
         break;
       case "sold":
         dataToSave = {

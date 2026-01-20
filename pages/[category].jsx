@@ -123,7 +123,9 @@ export async function getServerSideProps({ params, query, req }) {
   let listingCount;
 
   try {
-    const data = await listingsAPI({});
+    const data = await listingsAPI({query:{
+      published: true
+    }});
     listings = data.listings;
 
     let queryFromUrl = getQueryFromUrl(params.category);

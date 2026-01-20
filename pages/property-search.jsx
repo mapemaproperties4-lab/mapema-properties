@@ -29,7 +29,7 @@ export default function ListingListPage({ listings, totalCount }) {
       <SEO
         title="Search Properties"
         slug="/property-search"
-        description="Find your dream property with Zurafa Properties' advanced search tool. Explore a wide range of homes, apartments, and commercial spaces for sale or rent across Kenya. Filter by location, price, property type, and more to discover the perfect property that fits your needs. Start your search today"
+        description="Find your dream property with Mapema Properties' advanced search tool. Explore a wide range of homes, apartments, and commercial spaces for sale or rent across Kenya. Filter by location, price, property type, and more to discover the perfect property that fits your needs. Start your search today"
       />
       <Nav />
       <Breadcrumbs title="Property Search" breadcrumbs={pl} />
