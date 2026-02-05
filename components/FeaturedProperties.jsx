@@ -8,10 +8,10 @@ const FeaturedProperties = ({ properties }) => {
     <section className="py-10 bg-gray-200">
       <div className="container mb-6 w-full flex flex-wrap justify-between items-end">
         <h2 className="font-bold">
-          <span className="text-4xl text-secondary inline-block mr-2">
+          <span className="text-4xl text-primary inline-block mr-2">
             Featured
           </span>
-          <span className="text-4xl text-primary">Properties</span>
+          <span className="text-4xl text-yellow-400">Properties</span>
         </h2>
       </div>
       <div className="container w-full grid gap-6 md:grid-cols-3">

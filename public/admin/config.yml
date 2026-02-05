@@ -1,6 +1,9 @@
 backend:
-  name: git-gateway
+  name: github
   branch: main
+  repo: geoffOkumu/mapema-properties
+  base_url: https://decap.gostudio.cloud
+  auth_endpoint: /auth
 media_folder: public/img
 public_folder: img
 editor:
