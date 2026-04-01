@@ -2,6 +2,7 @@ import Head from "next/head";
 import PageLoading from "../components/widgets/PageLoading";
 import "../styles/globals.css";
 import Script from "next/script";
+import { Analytics } from "@vercel/analytics/react";
 import { attributes as settings } from "../content/settings.md";
 import AuthWrapper from "../components/listings/AuthWrapper";
 
@@ -32,6 +33,7 @@ function MyApp({ Component, pageProps }) {
       <AuthWrapper>
         <PageLoading />
         <Component {...pageProps} />
+        <Analytics />
       </AuthWrapper>
       <Script
         strategy="afterInteractive"

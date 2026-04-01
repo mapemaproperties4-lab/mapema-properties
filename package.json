@@ -13,6 +13,7 @@
   "dependencies": {
     "@react-input/number-format": "^2.0.3",
     "@upstash/redis": "^1.32.0",
+    "@vercel/analytics": "^1.0.0",
     "@vercel/blob": "^1.1.1",
     "animate.css": "^4.1.1",
     "cloudinary": "^2.2.0",
