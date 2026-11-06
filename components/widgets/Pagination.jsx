@@ -5,6 +5,7 @@ export default function Pagination({
   postsPerPage,
   totalPosts,
   pathPrefix,
+  query = {},
   currentPage,
 }) {
   const pageNumbers = [];
@@ -20,10 +21,10 @@ export default function Pagination({
           Showing
           <span className="font-medium">
             {" "}
-            {currentPage * postsPerPage - postsPerPage}{" "}
+            {totalPosts ? (currentPage - 1) * postsPerPage + 1 : 0}{" "}
           </span>
           to
-          <span className="font-medium"> {currentPage * postsPerPage} </span>
+          <span className="font-medium"> {Math.min(currentPage * postsPerPage, totalPosts)} </span>
           of
           <span className="font-medium"> {totalPosts} </span>
           results
@@ -35,7 +36,7 @@ export default function Pagination({
             {pageNumbers.map((number) => (
               <Link
                 key={number}
-                href={`${pathPrefix}?page=${number}`}
+                href={{ pathname: pathPrefix, query: { ...query, page: number } }}
                 className={
                   currentPage === number
                     ? "bg-blue border-red-300 text-red-500 hover:bg-blue-200 relative inline-flex items-center shrink-0 px-5 py-4 border text-sm font-medium rounded-full mr-2 mb-2"

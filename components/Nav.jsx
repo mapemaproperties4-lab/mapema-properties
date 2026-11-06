@@ -173,7 +173,7 @@ const Nav = () => {
                 </div>
                 <div className="group relative w-full md:w-auto">
                   <Link
-                    href="/properties"
+                    href="/properties-for-rent"
                     className="flex items-center mx-4 h-[100px] box-border md:group-hover:border-t-4 group-hover:border-t-gold group-hover:text-gold"
                   >
                     <span className="text-base ">For Rent</span>
@@ -193,7 +193,7 @@ const Nav = () => {
                 </div>
                 <div className="group relative w-full md:w-auto">
                   <Link
-                    href="/properties"
+                    href="/properties-for-sale"
                     className="flex items-center mx-4 h-[100px] box-border md:group-hover:border-t-4 group-hover:border-t-gold group-hover:text-gold"
                   >
                     <span className="text-base ">For Sale</span>

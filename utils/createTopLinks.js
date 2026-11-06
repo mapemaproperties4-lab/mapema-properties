@@ -1,18 +1,23 @@
-import { flatten, kebabCase, snakeCase } from "lodash";
+import { flatten, kebabCase } from "lodash";
 import { attributes as locationData } from "../content/locations.md";
+
+const withLocation = (link, location) => {
+  const [path, query] = link.split("?");
+  return `${path}-in-${kebabCase(location)}${query ? "?" + query : ""}`;
+};
 
 const addLocationToLinks = (links) =>
   flatten(
     links.map((link) =>
       locationData.allLocations.map((location) => ({
         title: link.title + " in " + location,
-        link: `${link.link}-in-${kebabCase(location)}`,
+        link: withLocation(link.link, location),
       }))
     )
   );
 
 export default function createTopLinks(offer, location) {
-  const allLocations = locationData.allLocations;
+  let baseLinks = [];
   let defaultRentLinks = [
     { title: "Apartments for rent", link: "apartment-for-rent" },
     {
@@ -74,16 +79,18 @@ export default function createTopLinks(offer, location) {
   let locationList = [];
 
   if (offer === "rent") {
+    baseLinks = defaultRentLinks;
     finalLinks = [...defaultRentLinks, ...addLocationToLinks(defaultRentLinks)];
     finalPriceFilters = rentPriceFilters;
   }
 
   if (offer === "sale") {
+    baseLinks = defaultSaleLinks;
     finalLinks = [...defaultSaleLinks, ...addLocationToLinks(defaultSaleLinks)];
     finalPriceFilters = salePriceFilters;
   }
 
-  if (offer === "NONE") {
+  if (!finalLinks) {
     finalLinks = [
       { title: "Properties for sale", link: "properties-for-sale" },
       { title: "Properties for rent", link: "properties-for-rent" },
@@ -91,13 +98,14 @@ export default function createTopLinks(offer, location) {
       { title: "Houses", link: "house" },
       { title: "Commercial Properties", link: "commercial_property" },
     ];
+    baseLinks = finalLinks;
     finalPriceFilters = [];
   }
 
   if (location) {
-    locationList = finalLinks.map((i) => ({
+    locationList = baseLinks.map((i) => ({
       title: `${i.title} in ${location}`,
-      link: `${i.link}-in-${snakeCase(location)}`,
+      link: withLocation(i.link, location),
     }));
   }
 

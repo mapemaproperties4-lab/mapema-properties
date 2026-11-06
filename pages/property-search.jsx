@@ -9,8 +9,6 @@ import Nav from "../components/Nav";
 import SearchForm from "../components/SearchForm";
 import Breadcrumbs from "../components/widgets/Breadcrumbs";
 import Pagination from "../components/widgets/Pagination";
-import { NEXT_PUBLIC_TEAM_ID } from "../utils/constants";
-import { objectToGetParams } from "../utils/objectToGetParams";
 import SEO from "../components/SEO";
 import { listingsAPI } from "../utils/listingsAPI";
 
@@ -67,9 +65,10 @@ export default function ListingListPage({ listings, totalCount }) {
 
       <section className="container pb-10">
         <Pagination
-          currentPage={router.query.page || 1}
-          pathPrefix={"/" + router.query.category + "?page="}
-          postsPerPage={10}
+          currentPage={Number(router.query.page) || 1}
+          pathPrefix="/property-search"
+          query={router.query}
+          postsPerPage={12}
           totalPosts={totalCount}
         />
       </section>
@@ -80,34 +79,7 @@ export default function ListingListPage({ listings, totalCount }) {
   );
 }
 
-export async function getServerSideProps({ params, query, req }) {
-  let listings = [];
-  let listingCount;
-
-  try {
-    const res = await listingsAPI({ query });
-    listings = res.listings;
-
-    // pagination
-    listingCount = listings.length;
-    const itemsPerPage = 12;
-
-    if (query && query.page) {
-      listings = listings.slice(
-        query.page * itemsPerPage - itemsPerPage,
-        query.page * itemsPerPage
-      );
-    } else {
-      listings = listings.slice(0, itemsPerPage);
-    }
-  } catch (err) {
-    console.log(err);
-    return {
-      notFound: true,
-    };
-  }
-
-  return {
-    props: { listings, totalCount: listingCount },
-  };
+export async function getServerSideProps({ query }) {
+  const { listings, totalCount } = await listingsAPI({ query: { ...query, page: query.page || 1 } });
+  return { props: { listings, totalCount } };
 }

@@ -17,7 +17,7 @@ export default function LandSellers() {
           suit your needs. We offer fair and competitive rental prices along
           with flexible lease terms"
         slug={`/services/letting`}
-        img="/img/riverside.jpg"
+        img="/img/house-8.jpeg"
       />
       <Nav />
       <Breadcrumbs
@@ -26,7 +26,7 @@ export default function LandSellers() {
           { title: "Home", link: "/" },
           {
             title: "Services",
-            link: `/services`,
+            link: "/#services",
           },
         ]}
       />

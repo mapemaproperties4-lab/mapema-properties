@@ -27,7 +27,7 @@ export default function JointVentures() {
           { title: "Home", link: "/" },
           {
             title: "Services",
-            link: `/services`,
+            link: "/#services",
           },
         ]}
       />

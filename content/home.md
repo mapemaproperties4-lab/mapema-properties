@@ -27,7 +27,7 @@ services:
     img: /img/img119.jpg
     copy: >-
       Turn your idle land into a profitable venture. Through strategic partnerships, Mapema Properties collaborates with landowners to develop residential or commercial projects. We bring in market knowledge, technical expertise, and trusted networks to transform your property into a long-term asset with shared benefits.
-    link: /services/joint-ventures
+    link: /services/projects
     linkText: Learn More
 
 teamCopy: >-

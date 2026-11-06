@@ -11,11 +11,6 @@ import SEO from "../components/SEO";
 import SocialMediaCTA from "../components/SocialMediaCTA";
 import TopLocations from "../components/TopLocations";
 import TrendingSearch from "../components/TrendingSearch";
-import {
-  NEXT_PUBLIC_TEAM_ID,
-  API_ENDPOINT,
-  COMPANY_ID,
-} from "../utils/constants";
 
 import data from "../data.json";
 
@@ -40,22 +35,6 @@ export default function Home(props) {
 }
 
 export async function getServerSideProps() {
-  // fetch listings
-  let listings = [];
-  try {
-    const res = await fetch(
-      `${API_ENDPOINT}/properties/all?company_id=${COMPANY_ID}&published=true&limit=6`,
-    );
-    const dataData = await res.json();
-
-    if (dataData && dataData.length) {
-      listings = dataData.slice(0, 6);
-    }
-  } catch (err) {
-    console.log(err);
-  }
-
-  return {
-    props: { listings },
-  };
+  const { listings } = await listingsAPI({ query: { limit: 6 } });
+  return { props: { listings } };
 }

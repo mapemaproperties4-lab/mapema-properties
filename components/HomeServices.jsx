@@ -6,7 +6,7 @@ import { ChevronRight } from "react-feather";
 const HomeServices = () => {
   return (
     <>
-      <section className="w-full relative mb-10">
+      <section id="services" className="w-full relative mb-10">
         <div className="md:absolute md:inset-0">
           <div className="container w-full flex md:justify-start">
             <div className="md:w-1/2">
@@ -22,6 +22,7 @@ const HomeServices = () => {
                 <div>
                   {data.services.map((i) => (
                     <Link
+                      key={i.title}
                       href={i.link}
                       className="hover:text-primary py-4 border-t last:border-b flex w-full justify-between items-center"
                     >

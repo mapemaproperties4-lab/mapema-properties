@@ -18,7 +18,7 @@ export default function JointVentures() {
           structure your portfolio by availing to you data on current and future
           earning capacities of the investment in question."
         slug={`/services/investment`}
-        img="/img/kiambu-homes.jpeg"
+        img="/img/img-1.jpg"
       />
       <Nav />
       <Breadcrumbs
@@ -27,7 +27,7 @@ export default function JointVentures() {
           { title: "Home", link: "/" },
           {
             title: "Services",
-            link: `/services`,
+            link: "/#services",
           },
         ]}
       />

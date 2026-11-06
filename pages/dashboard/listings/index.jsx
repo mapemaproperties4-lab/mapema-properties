@@ -6,13 +6,12 @@ import Footer from "../../../components/Footer";
 import Link from "next/link";
 import { Edit, Edit3, Trash } from "react-feather";
 import LoadingSpinner from "../../../components/widgets/LoadingSpinner";
-import { API_ENDPOINT } from "../../../utils/constants";
-import { formatDistance } from "date-fns";
 
 export default function ListingsPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [listings, setListings] = useState([]);
+  const [error, setError] = useState(false);
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const listingsPerPage = 10;
@@ -32,13 +31,16 @@ export default function ListingsPage() {
   useEffect(() => {
     async function fetchListings() {
       setLoading(true);
-      let res = await fetch(`${API_ENDPOINT}/properties/all?company_id=2`);
-      let fetchedListings = await res.json();
-
-      if (fetchedListings) {
-        setListings(fetchedListings);
+      try {
+        const res = await fetch("/api/get-listings");
+        if (!res.ok) throw new Error("Listings unavailable");
+        const { data } = await res.json();
+        setListings(data);
+      } catch {
+        setError(true);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     }
     fetchListings();
     return () => {};
@@ -120,7 +122,7 @@ export default function ListingsPage() {
               <Link
                 href={`/dashboard/listings/${i.id}`}
                 className="p-4 rounded w-full bg-white mb-2 flex gap-4"
-                key={i.marketing_title}
+                key={i.id}
               >
                 <img
                   src={
@@ -137,11 +139,6 @@ export default function ListingsPage() {
                   <h3 className="mb-2 font-bold">{i.marketing_title}</h3>
                   <div className="flex gap-4 flex-wrap">
                     <span className="text-primary">ID: # {i.id}</span>
-                    <span>
-                      {formatDistance(new Date(i.created_at), new Date(), {
-                        addSuffix: true,
-                      })}
-                    </span>
                     <span className="block mb-2">
                       {i.price_unit}{" "}
                       {i.offer === "sale"
@@ -165,7 +162,7 @@ export default function ListingsPage() {
             ))}
             {!loading && paginatedListings.length === 0 && (
               <h3 className="text-3xl font-bold block my-[100px] text-center">
-                No listings found.
+                {error ? "Could not load listings." : "No listings found."}
               </h3>
             )}
             {/* Pagination Controls */}

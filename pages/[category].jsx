@@ -1,4 +1,3 @@
-import { includes, snakeCase } from "lodash";
 import { upperFirst } from "lodash";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
@@ -12,7 +11,6 @@ import PropertyLinks from "../components/PropertyLinks";
 import SearchForm from "../components/SearchForm";
 import Breadcrumbs from "../components/widgets/Breadcrumbs";
 import Pagination from "../components/widgets/Pagination";
-import { NEXT_PUBLIC_TEAM_ID } from "../utils/constants";
 import createTopLinks from "../utils/createTopLinks";
 import getQueryFromUrl from "../utils/getQueryFromURL";
 import { isPropertyType } from "../utils/isPropertyType";
@@ -27,7 +25,7 @@ export default function ListingListPage({ listings, totalCount }) {
   const { propertyTypeQuery, offerQuery, locationQuery } = pageDetails;
 
   const topLinks = createTopLinks(
-    offerQuery !== "NONE" ? offerQuery : null,
+    offerQuery,
     locationQuery !== "NONE" ? locationQuery.replaceAll("_", " ") : null
   );
 
@@ -35,8 +33,10 @@ export default function ListingListPage({ listings, totalCount }) {
     propertyTypeQuery !== "properties" ? "s" : ""
   }`.replace("_", "/");
   let d = offerQuery !== "NONE" ? "for " + offerQuery : "";
-  let e = locationQuery !== "NONE" ? "in " + locationQuery : "";
-  let pageTitle = `${c} ${d} ${e}`;
+  let e = locationQuery !== "NONE" ? "in " + locationQuery.replaceAll("_", " ") : "";
+  let pageTitle = Object.keys(pageDetails.filters).length
+    ? upperFirst(router.query.category.replaceAll("-", " "))
+    : `${c} ${d} ${e}`;
   let description = `${pageTitle}`;
   let pl = [
     { title: "Home", link: "/" },
@@ -103,6 +103,7 @@ export default function ListingListPage({ listings, totalCount }) {
         <Pagination
           currentPage={router.query.page ? parseInt(router.query.page) : 1}
           pathPrefix={"/" + router.query.category}
+          query={Object.fromEntries(Object.entries(router.query).filter(([key]) => key !== "category"))}
           postsPerPage={12}
           totalPosts={totalCount}
         />
@@ -118,95 +119,17 @@ export default function ListingListPage({ listings, totalCount }) {
   );
 }
 
-export async function getServerSideProps({ params, query, req }) {
-  let listings = [];
-  let listingCount;
-
-  try {
-    const data = await listingsAPI({query:{
-      published: true
-    }});
-    listings = data.listings;
-
-    let queryFromUrl = getQueryFromUrl(params.category);
-    console.log(queryFromUrl);
-
-    // filter results by property type
-    const filterByType = (l) => {
-      if (queryFromUrl.propertyTypeQuery === "properties") {
-        return l;
-      } else {
-        let r = l.filter(
-          (i) => i.property_type === queryFromUrl.propertyTypeQuery
-        );
-
-        return r;
-      }
-    };
-
-    // filter results by location
-    const filterByLocation = (l) => {
-      if (queryFromUrl.locationQuery === "NONE") {
-        return l;
-      } else {
-        let r = l.filter((i) =>
-          includes(
-            snakeCase(
-              `${i.region || ""} ${i.town_suburb || ""} ${i.address || ""}`
-            ),
-            queryFromUrl.locationQuery
-          )
-        );
-
-        return r;
-      }
-    };
-
-    // filter results by offer
-    const filterByOffer = (l) => {
-      if (queryFromUrl.offerQuery === "NONE") {
-        return l;
-      } else {
-        let r = l.filter((i) => i.offer === queryFromUrl.offerQuery);
-
-        return r;
-      }
-    };
-
-    listings = filterByType(listings);
-    listings = filterByLocation(listings);
-    listings = filterByOffer(listings);
-
-    // handle 404 pages
-    if (
-      listings.length === 0 &&
-      !isPropertyType(queryFromUrl.propertyTypeQuery)
-    ) {
-      return {
-        notFound: true,
-      };
-    }
-
-    // pagination
-    listingCount = listings.length;
-    const itemsPerPage = 12;
-
-    if (query && query.page) {
-      listings = listings.slice(
-        query.page * itemsPerPage - itemsPerPage,
-        query.page * itemsPerPage
-      );
-    } else {
-      listings = listings.slice(0, itemsPerPage);
-    }
-  } catch (err) {
-    console.log(err);
-    return {
-      notFound: true,
-    };
-  }
-
-  return {
-    props: { listings, totalCount: listingCount },
-  };
+export async function getServerSideProps({ params, query }) {
+  const { propertyTypeQuery, offerQuery, locationQuery, filters } = getQueryFromUrl(params.category);
+  if (!["NONE", "rent", "sale", "shortlet"].includes(offerQuery)) return { notFound: true };
+  const result = await listingsAPI({ query: {
+    ...query,
+    ...filters,
+    propertyType: propertyTypeQuery === "properties" ? null : propertyTypeQuery,
+    offer: offerQuery === "NONE" ? null : offerQuery,
+    address: locationQuery === "NONE" ? null : locationQuery.replaceAll("_", " "),
+    page: query.page || 1,
+  } });
+  if (!result.totalCount && !isPropertyType(propertyTypeQuery) && !filters.propertyType) return { notFound: true };
+  return { props: result };
 }

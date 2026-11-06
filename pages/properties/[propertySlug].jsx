@@ -28,9 +28,10 @@ import { attributes } from "../../content/settings.md";
 import SocialShare from "../../components/widgets/SocialShare";
 import SEO from "../../components/SEO";
 import MorgageCalculator from "../../components/MorgageCalculator";
-import { getListingByID, listingsAPI } from "../../utils/listingsAPI";
+import { getListings } from "../../lib/publicListings";
+import { propertySlug } from "../../utils/propertySlug";
 
-export default function PropertyPage({ data }) {
+export default function PropertyPage({ data: listing, related }) {
   const router = useRouter();
   const [showSlider, setShowSlider] = useState(false);
   const [showMore, setShowMore] = useState(false);
@@ -43,16 +44,6 @@ export default function PropertyPage({ data }) {
     }
   }, []);
 
-  let listing;
-
-  if (!router.isFallback) {
-    listing = data;
-  }
-
-  if (router.isFallback) {
-    return <div>Loading...</div>;
-  }
-
   const listingTitle =
     listing.marketing_title ||
     `${upperFirst(listing.property_type)} for ${listing.offer} at ${
@@ -61,7 +52,7 @@ export default function PropertyPage({ data }) {
 
   const features = getStructuredFeatures(listing.features || []);
   const topLinks = createTopLinks(
-    listing.offer === "sale" ? "sale" : "rent",
+    listing.offer,
     listing.town_suburb || listing.region
   );
 
@@ -78,12 +69,10 @@ export default function PropertyPage({ data }) {
       <Nav />
       <SEO
         title={listing.marketing_title || listingTitle}
-        slug={`/${listing.property_type}-for-${listing.offer}-at-${
-          kebabCase(listing.town_suburb) || kebabCase(listing.region)
-        }-${listing.id}`}
+        slug={`/properties/${propertySlug(listing)}`}
         img={
           listing?.images && listing.images.length > 0
-            ? listing.images[0].secure_url
+            ? listing.cover?.url || listing.images[0].url
             : "/img/land.jpg"
         }
         description={truncate(listing.description, { length: 200 })}
@@ -114,6 +103,7 @@ export default function PropertyPage({ data }) {
               <span>Enquire</span>
             </button>
             <button
+              disabled={!listing.images.length}
               onClick={() => setShowSlider(true)}
               className="group px-6 py-2.5 w-auto bg-primary text-white hover:bg-primary/90 uppercase rounded-sm flex items-center rounded-tr-2xl"
             >
@@ -162,7 +152,7 @@ export default function PropertyPage({ data }) {
                 <span className="text-base md:text-xl">
                   {listing.property_type === "land_plot"
                     ? `${listing.size} ${listing.size_unit}`
-                    : `${listing?.floor_size || "-"} ${listing.floor_sizeunit}`}
+                    : `${listing?.floor_size || "-"} ${listing.floor_size_unit}`}
                 </span>
               </div>
               {/* <div className="flex items-center p-4 w-full py-6 bg-gray-200">
@@ -178,7 +168,7 @@ export default function PropertyPage({ data }) {
               style={showMore ? { height: "auto" } : { height: 240 }}
               className="text-gray-700 text-xl overflow-y-hidden"
             >
-              {listing?.description.split(/\r?\n/).map((p, index) => (
+              {listing.description?.split(/\r?\n/).map((p, index) => (
                 <p key={index} className="mb-2">
                   {p}
                 </p>
@@ -218,9 +208,9 @@ export default function PropertyPage({ data }) {
                 />
                 <DetailsCard title="Address" value={listing.address} />
                 <DetailsCard
-                  title="Rent Price"
+                  title={listing.offer === "sale" ? "Sale Price" : "Rent Price"}
                   value={`${listing.price_unit} ${numberWithCommas(
-                    listing.rent_price || "-"
+                    (listing.offer === "sale" ? listing.sale_price : listing.rent_price) ?? "-"
                   )}`}
                 />
                 <DetailsCard
@@ -237,7 +227,7 @@ export default function PropertyPage({ data }) {
                     listing.property_type === "land_plot"
                       ? `${listing.size} ${listing.size_unit}`
                       : `${listing?.floor_size || "-"} ${
-                          listing.floor_sizeunit
+                          listing.floor_size_unit
                         }`
                   }
                 />
@@ -364,10 +354,8 @@ export default function PropertyPage({ data }) {
               </h4>
               <span className="text-3xl text-white block">
                 {listing.price_unit}{" "}
-                {listing.offer === "rent"
-                  ? numberWithCommas(listing.rent_price || "-")
-                  : numberWithCommas(listing.sale_price || "-")}
-                {listing.offer === "rent" && (
+                {numberWithCommas((listing.offer === "sale" ? listing.sale_price : listing.rent_price) ?? "-")}
+                {listing.offer !== "sale" && (
                   <small className="inline-block ml-2">
                     {listing.rent_term}
                   </small>
@@ -402,17 +390,14 @@ export default function PropertyPage({ data }) {
               <SocialShare
                 description={listing?.description}
                 title={listing.marketing_title || listingTitle}
-                slug={`${listing.property_type}-for-${listing.offer}-at-${
-                  kebabCase(listing.town_suburb) || kebabCase(listing.region)
-                }-${listing.id}`}
+                slug={`properties/${propertySlug(listing)}`}
               />
             </div>
           </div>
         </div>
       </section>
       <RelatedProperties
-        offer={listing.offer}
-        propertyType={listing.property_type}
+        listings={related}
         topLinks={topLinks}
       />
       <Footer />
@@ -427,36 +412,15 @@ const DetailsCard = ({ title, value = "-" }) => (
   </div>
 );
 
-export async function getStaticPaths() {
-  const data = await listingsAPI({});
+export async function getServerSideProps({ params }) {
+  const id = params.propertySlug.split("-").pop();
+  if (!/^\d+$/.test(id)) return { notFound: true };
+  const listings = await getListings();
+  const listing = listings.find((item) => String(item.id) === id);
+  if (!listing) return { notFound: true };
 
-  const paths = data.listings.map((i) => ({
-    params: {
-      propertySlug: `${i.property_type}-for-${i.offer}-at-${
-        kebabCase(i.town_suburb) || kebabCase(i.region)
-      }-${i.id}`,
-    },
-  }));
-
-  return { paths, fallback: true };
-}
-
-export async function getStaticProps(context) {
-  const {
-    params: { propertySlug },
-  } = context;
-
-  let uniqId = propertySlug.split("-").slice(-1).pop();
-
-  const data = await getListingByID(uniqId);
-
-  if (!data) {
-    return {
-      notFound: true,
-    };
-  }
-
-  return {
-    props: { data: data.listing },
-  };
+  const related = listings.filter((item) =>
+    item.id !== listing.id && item.property_type === listing.property_type && item.offer === listing.offer
+  ).slice(0, 3);
+  return { props: { data: listing, related } };
 }

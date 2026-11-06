@@ -5,7 +5,7 @@ import Footer from "../../../components/Footer";
 import EditListing from "../../../components/listings/EditListing";
 import { useRouter } from "next/router";
 import LoadingSpinner from "../../../components/widgets/LoadingSpinner";
-import { API_ENDPOINT } from "../../../utils/constants";
+import { API_ORIGIN, COMPANY_ID } from "../../../lib/listingConfig";
 
 export default function ListingsPage() {
   const router = useRouter();
@@ -38,21 +38,29 @@ const EditListingWrapper = ({ listingID }) => {
   const [data, setData] = useState();
 
   useEffect(() => {
+    let active = true;
     async function fetchListing() {
       setLoading(true);
-      let res = await fetch(`${API_ENDPOINT}/properties/${listingID}`);
-      let fetchedListing = await res.json();
-
-      setData(fetchedListing);
-      setLoading(false);
+      try {
+        // The editor needs the legacy editing fields that public v2 intentionally omits.
+        const res = await fetch(`${API_ORIGIN}/api/v1/properties/${encodeURIComponent(listingID)}`);
+        if (!res.ok) throw new Error("Listing unavailable");
+        const record = await res.json();
+        if (active) setData(record.company_id === COMPANY_ID ? record : null);
+      } catch {
+        if (active) setData(null);
+      } finally {
+        if (active) setLoading(false);
+      }
     }
 
     if (listingID) {
       fetchListing();
     }
 
-    return () => {};
+    return () => { active = false; };
   }, [listingID]);
 
-  return <>{loading ? <LoadingSpinner /> : <EditListing listing={data} />}</>;
+  if (loading) return <LoadingSpinner />;
+  return data ? <EditListing listing={data} /> : <p>Could not load this listing.</p>;
 };

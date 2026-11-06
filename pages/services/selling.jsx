@@ -15,7 +15,7 @@ export default function JointVentures() {
           the market. Our team of professionals will handle your property sale
           from start to finish."
         slug="/services/selling"
-        img="/img/runda.jpg"
+        img="/img/img-5.jpg"
       />
       <Nav />
       <Breadcrumbs
@@ -24,7 +24,7 @@ export default function JointVentures() {
           { title: "Home", link: "/" },
           {
             title: "Services",
-            link: `/services`,
+            link: "/#services",
           },
         ]}
       />

@@ -256,9 +256,9 @@ export default function SearchForm() {
                 >
                   <option value="">Furnishing</option>
                   {[
-                    { title: "Fully Furnished", value: "true" },
-                    { title: "Semi-Furnished", value: "true" },
-                    { title: "Not Furnished", value: "false" },
+                    { title: "Fully Furnished", value: "furnished" },
+                    { title: "Semi-Furnished", value: "semi-furnished" },
+                    { title: "Not Furnished", value: "unfurnished" },
                   ].map((o) => (
                     <option key={o.value} value={o.value}>
                       {o.title}

@@ -4,9 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "removedpredev": "node scripts/get-data && node scripts/get-listings",
+    "predev": "node scripts/get-data",
     "build": "next build",
-    "prebuild": "node scripts/get-data && node scripts/get-listings",
+    "prebuild": "node scripts/get-data",
     "start": "next start",
     "lint": "next lint"
   },

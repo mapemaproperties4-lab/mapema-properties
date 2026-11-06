@@ -1,55 +1,14 @@
-import { Redis } from "@upstash/redis";
+import { getListings } from "../../lib/publicListings";
 
-const resultsHandler = async (req, res) => {
-  // Retrieve data from redis
-
-  const redis = new Redis({
-    url: process.env.UPSTASH_REDIS_REST_URL,
-    token: process.env.UPSTASH_REDIS_REST_TOKEN,
-  });
-
+export default async function handler(req, res) {
+  if (req.method !== "GET") return res.status(405).setHeader("Allow", "GET").end();
   try {
-    //Find all the entries in the set
-    const entries = await redis.smembers("entries");
-
-    //Get all survey entries by id/key
-
-    //To run multiple queries at once, Upstash supports the use of the pipeline command. This way we can run multiple queries at once and get the results in a single call.
-    const p = redis.pipeline();
-    entries.forEach((id) => {
-      p.hgetall(id);
-    });
-    const results = await p.exec();
-
-    // Combine each result with its corresponding id
-    let combinedResults = results.map((data, index) => ({
-      id: entries[index],
-      ...data,
-    }));
-
-    // order by latest
-    combinedResults = combinedResults.sort(
-      (a, b) => new Date(b.created_at) - new Date(a.created_at)
-    );
-
-    if (req.query && req.query.limit) {
-      combinedResults = combinedResults.slice(0, parseInt(req.query.limit));
-    }
-
-    return res.status(200).json({
-      success: true,
-      message: "Data retrieved successfully",
-      data: combinedResults,
-    });
+    const listings = await getListings();
+    const limit = Number(req.query.limit);
+    const data = Number.isInteger(limit) && limit > 0 ? listings.slice(0, limit) : listings;
+    return res.status(200).json({ success: true, data });
   } catch (error) {
-    console.error("Failed to retrieve data from redis", error);
-
-    return res.status(500).json({
-      success: false,
-      message: "Failed to retrieve data from redis",
-      data: [],
-    });
+    console.error("Could not load listings", error);
+    return res.status(502).json({ success: false, message: "Listings are temporarily unavailable." });
   }
-};
-
-export default resultsHandler;
+}

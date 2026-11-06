@@ -3,7 +3,8 @@ import { attributes as data } from "../content/seo.md";
 import { attributes as settings } from "../content/settings.md";
 import { listingsAPI } from "../utils/listingsAPI";
 import { propertiesLinks, quickLinks, servicesLinks } from "../utils/menu";
-import { kebabCase, snakeCase } from "lodash";
+import { propertySlug } from "../utils/propertySlug";
+import { snakeCase } from "lodash";
 
 const SITE_URL = data.siteUrl;
 
@@ -16,7 +17,7 @@ function generateSiteMap(listings) {
             <loc>${SITE_URL + i.link}</loc>
         </url>
      `
-     )}
+     ).join("")}
 
      ${data.topSearches.map(
        (i) => `
@@ -24,7 +25,7 @@ function generateSiteMap(listings) {
             <loc>${SITE_URL + i.link}</loc>
         </url>
      `
-     )}
+     ).join("")}
 
      ${settings.topLocations.map(
        (i) => `
@@ -32,7 +33,7 @@ function generateSiteMap(listings) {
             <loc>${SITE_URL + "/properties-for-sale-in-" + snakeCase(i)}</loc>
         </url>
      `
-     )}
+     ).join("")}
 
      ${settings.topLocations.map(
        (i) => `
@@ -40,7 +41,7 @@ function generateSiteMap(listings) {
             <loc>${SITE_URL + "/house-for-sale-in-" + snakeCase(i)}</loc>
         </url>
      `
-     )}
+     ).join("")}
 
      ${settings.topLocations.map(
        (i) => `
@@ -48,7 +49,7 @@ function generateSiteMap(listings) {
             <loc>${SITE_URL + "/land_plot-for-sale-in-" + snakeCase(i)}</loc>
         </url>
      `
-     )}
+     ).join("")}
 
      ${settings.topLocations.map(
        (i) => `
@@ -56,15 +57,13 @@ function generateSiteMap(listings) {
             <loc>${SITE_URL + "/apartment-for-sale-in-" + snakeCase(i)}</loc>
         </url>
      `
-     )}
+     ).join("")}
      
      ${listings
        .map((i) => {
          return `
        <url>
-           <loc>${SITE_URL}/properties/${i.property_type}-for-${i.offer}-at-${
-           kebabCase(i.town_suburb) || kebabCase(i.city_region)
-         }-${i.id}</loc>
+           <loc>${SITE_URL}/properties/${propertySlug(i)}</loc>
        </url>
      `;
        })

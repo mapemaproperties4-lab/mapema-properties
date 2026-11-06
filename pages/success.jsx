@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { CheckCircle } from "react-feather";
 import React from "react";
 import Footer from "../components/Footer";
 import Nav from "../components/Nav";
@@ -17,16 +17,7 @@ export default function LocationsPage() {
       />
       <section className="py-14 container max-w-5xl text-center">
         <div className="w-[140px] h-[140px] inline-flex justify-center items-center rounded-full border bg-white mb-5">
-          <video
-            width="80"
-            height="80"
-            loop={true}
-            autoPlay={true}
-            muted={true}
-          >
-            <source src="/img/folder.mp4" type="video/mp4" />
-            Your browser does not support the video tag.
-          </video>
+          <CheckCircle size={80} aria-hidden="true" />
         </div>
         <h1 className="font-bold uppercase text-5xl md:text-6xl mb-5 font-serif text-center mx-auto max-w-4xl">
           Request Submitted

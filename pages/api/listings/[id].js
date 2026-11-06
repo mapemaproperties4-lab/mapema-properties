@@ -1,3 +1,4 @@
+import { getListings } from "../../../lib/publicListings";
 import { API_ENDPOINT } from "../../../utils/constants";
 
 export default async function handler(req, res) {
@@ -8,30 +9,14 @@ export default async function handler(req, res) {
 
   //   GET
   if (req.method === "GET") {
-    let data;
     try {
-      // Fetch the survey data
-      let serverRestponse = await fetch(`${API_ENDPOINT}/properties/${id}`, {
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-      });
-
-      data = serverRestponse.json();
+      const listing = (await getListings()).find((item) => String(item.id) === id);
+      if (!listing) return res.status(404).json({ success: false });
+      return res.status(200).json({ success: true, data: listing });
     } catch (error) {
-      console.error("Failed to fetch data", error);
-
-      return res.status(500).json({
-        success: false,
-        message: "Failed to fetch data from redis",
-      });
+      console.error("Could not load listing", error);
+      return res.status(502).json({ success: false });
     }
-
-    return res.status(200).json({
-      success: true,
-      data: { id, ...data },
-    });
   }
 
   //   POST
